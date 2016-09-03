@@ -1,5 +1,8 @@
 .idea
 obj/*
 bin/*
+*/obj/*
+*/bin/*
 *.DotSettings.user
 *.exe
+packages
