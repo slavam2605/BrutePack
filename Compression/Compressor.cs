@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace BrutePack
+namespace BrutePack.Compression
 {
     public interface Compressor
     {
