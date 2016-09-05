@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestTest.cs" />
+    <Compile Include="TestUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
