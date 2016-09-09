@@ -32,11 +32,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BitStream, Version=1.0.0.3, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\BitStream.1.0.3\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10\BitStream.dll</HintPath>
+    </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.1.5.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
       <HintPath>packages\JetBrains.Annotations.10.1.5\lib\net\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO" />
+    <Reference Include="System.Runtime" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -46,6 +51,8 @@
     <Compile Include="BrutePackMain.cs" />
     <Compile Include="Compression\Compressor.cs" />
     <Compile Include="Compression\DummyCompressor.cs" />
+    <Compile Include="Deflate\DeflateDecompressor.cs" />
+    <Compile Include="GZip\GZipDecompressor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Compression" />
+    <Folder Include="Deflate" />
+    <Folder Include="GZip" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
