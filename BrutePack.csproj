@@ -53,6 +53,7 @@
     <Compile Include="Compression\DummyCompressor.cs" />
     <Compile Include="Deflate\DeflateDecompressor.cs" />
     <Compile Include="GZip\GZipDecompressor.cs" />
+    <Compile Include="Huffman\HuffmanTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +63,7 @@
     <Folder Include="Compression" />
     <Folder Include="Deflate" />
     <Folder Include="GZip" />
+    <Folder Include="Huffman" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -4,6 +4,7 @@ using System.Xml.Schema;
 using BitStream;
 using BrutePack.Compression;
 using BrutePack.GZip;
+using BrutePack.Huffman;
 
 namespace BrutePack
 {
