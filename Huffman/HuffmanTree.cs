@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace BrutePack.Huffman
 {
@@ -52,6 +50,11 @@ namespace BrutePack.Huffman
         public HuffmanDecoder GetDecoder()
         {
             return new HuffmanDecoder(this);
+        }
+
+        public override string ToString()
+        {
+            return string.Join(";", codes);
         }
 
         public class HuffmanDecoder

@@ -35,6 +35,9 @@
     <Reference Include="BitStream, Version=1.0.0.3, Culture=neutral, PublicKeyToken=null">
       <HintPath>packages\BitStream.1.0.3\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10\BitStream.dll</HintPath>
     </Reference>
+    <Reference Include="BitStream, Version=1.0.0.3, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\BitStream.1.0.3\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10\BitStream.dll</HintPath>
+    </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.1.5.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
       <HintPath>packages\JetBrains.Annotations.10.1.5\lib\net\JetBrains.Annotations.dll</HintPath>
     </Reference>

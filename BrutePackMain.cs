@@ -1,10 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
-using System.Xml.Schema;
-using BitStream;
-using BrutePack.Compression;
 using BrutePack.GZip;
-using BrutePack.Huffman;
 
 namespace BrutePack
 {
@@ -12,10 +10,17 @@ namespace BrutePack
     {
         public static void Main(string[] args)
         {
-            GZipDecompressor.Decompress(
-                new FileStream("C:\\Users\\slava\\test.gz", FileMode.Open)
-                , null
-            );
+            try
+            {
+                GZipDecompressor.Decompress(
+                    new FileStream("C:\\Users\\slava\\test.bmp.gz", FileMode.Open)
+                    , new FileStream("C:\\Users\\slava\\test.bmp", FileMode.Create)
+                );
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
     }
 }
