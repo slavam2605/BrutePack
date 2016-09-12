@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
-using System.Threading;
-using BitStream;
+using BrutePack.BitStream;
+using BrutePack.DataStructure;
 using BrutePack.Huffman;
 
 namespace BrutePack.Deflate
@@ -33,71 +31,50 @@ namespace BrutePack.Deflate
         private static readonly int[] lengthsOrder =
             {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
 
-        private static int ReadBits(BitStream.BitStream stream, int bits)
-        {
-            var currentPower = 1;
-            var value = 0;
-            for (var i = 0; i < bits; i++)
-            {
-                byte bit;
-                stream.ReadBits(out bit, (BitNum) 1);
-                value += currentPower * bit;
-                currentPower <<= 1;
-            }
-            return value;
-        }
-
-        private static int ReadReversedBits(BitStream.BitStream stream, int bits)
-        {
-            if (bits <= 8)
-            {
-                byte bvalue;
-                stream.ReadBits(out bvalue, (BitNum) bits);
-                return bvalue;
-            }
-            var value = 0;
-            for (var i = 0; i < bits; i++)
-            {
-                byte bit;
-                stream.ReadBits(out bit, (BitNum) 1);
-                value <<= 1;
-                value += bit;
-            }
-            return value;
-        }
-
-        private static int FetchValue(BitStream.BitStream stream, HuffmanTree.HuffmanDecoder decoder)
+        private static int FetchValue(BitReader stream, HuffmanTree.HuffmanDecoder decoder)
         {
             while (true)
             {
-                byte bit;
-                stream.ReadBits(out bit, (BitNum) 1);
+                var bit = stream.ReadBit();
                 var value = decoder.Next(bit);
                 if (value >= 0)
                     return value;
             }
         }
 
-        private static void FinishByte(BitStream.BitStream stream)
+        private static byte[] ReadBytes(Stream stream, int count)
         {
-            byte rest;
-            stream.ReadBits(out rest, (BitNum) (8 - stream.BitPosition));
+            var buffer = new byte[count];
+            var read = 0;
+            while (read < count)
+            {
+                var result = stream.Read(buffer, read, count - read);
+                if (result == 0)
+                    break;
+                if (result < 0)
+                    throw new ApplicationException("wtf");
+                read += result;
+            }
+            return buffer;
         }
+
+        public static int[] literalTreeArray = new int[65536];
+        public static int[] offsetTreeArray = new int[65536];
 
         public static void Decompress(Stream input, Stream output)
         {
-            var bitStream = new BitStream.BitStream(input);
+            var bitStream = new BitReader(input);
             var data = new List<byte>();
             byte bfinal;
             do
             {
-                byte btype;
-                bitStream.ReadBits(out bfinal, (BitNum) 1);
-                bitStream.ReadBits(out btype, (BitNum) 2);
-                Console.WriteLine(bfinal == 0 ? "NOT_FINAL_BLOCK" : "FINAL_BLOCK");
-                Console.WriteLine(
-                    btype == 0 ? "NOT_COMPRESSED" : btype == 1 ? "STATIC_HUFFMAN" : "DYNAMIC_HUFFMAN"
-                );
+                bfinal = bitStream.ReadBit();
+                var btype = bitStream.ReadBits(2);
+//                Console.WriteLine(
+//                    (bfinal == 0 ? "NOT_FINAL_BLOCK" : "FINAL_BLOCK") +
+//                    " : " +
+//                    (btype == 0 ? "NOT_COMPRESSED" : btype == 1 ? "STATIC_HUFFMAN" : "DYNAMIC_HUFFMAN")
+//                );
                 switch (btype)
                 {
                     case 0:
@@ -122,72 +99,76 @@ namespace BrutePack.Deflate
 //            Console.WriteLine("\"");
         }
 
-        private static void DecompressCopy(BitStream.BitStream bitStream, IList<byte> data)
+        private static void DecompressCopy(BitReader bitStream, IList<byte> data)
         {
-            FinishByte(bitStream);
-
+            bitStream.FinishByte();
+            var byte1 = bitStream.ReadByte();
+            var byte2 = bitStream.ReadByte();
+            var len = byte1 + (byte2 << 8);
+            bitStream.Read(new byte[2], 0, 2); // skip 2 bytes
+            var buffer = ReadBytes(bitStream, len);
+            if (data.GetType() == typeof(BlockList<byte>))
+                ((BlockList<byte>) data).AddArray(buffer);
+            else if (data.GetType() == typeof(List<byte>))
+                ((List<byte>) data).AddRange(buffer);
+            else
+                foreach (var b in data)
+                {
+                    data.Add(b);
+                }
         }
 
-        private static void DecompressDynamic(BitStream.BitStream bitStream, IList<byte> data)
+        private static void DecompressDynamic(BitReader bitStream, IList<byte> data)
         {
 //            while (true)
 //            {
 //                byte bit;
-//                if (!bitStream.ReadBits(out bit, (BitNum) 1))
+//                if (!bitStream.ReadBits(out bit, 1))
 //                    break;
 //                Console.Write(bit);
 //            }
 //            return;
 
-            var lengthTree = new HuffmanTree();
-            var literalTree = new HuffmanTree();
-            var offsetTree = new HuffmanTree();
+            var lengthTree = new HuffmanTree(new int[512], 512);
 
-            var hlit = 257 + ReadBits(bitStream, 5);
-            var hdist = 1 + ReadBits(bitStream, 5);
-            var hclen = 4 + ReadBits(bitStream, 4);
-
-            Console.WriteLine(hlit + ", " + hdist + ", " + hclen);
+            var hlit = 257 + bitStream.ReadBits(5);
+            var hdist = 1 + bitStream.ReadBits(5);
+            var hclen = 4 + bitStream.ReadBits(4);
 
             var lengthLengths = new int[19];
             for (var i = 0; i < hclen; i++)
             {
-                lengthLengths[lengthsOrder[i]] = ReadBits(bitStream, 3);
+                lengthLengths[lengthsOrder[i]] = bitStream.ReadBits(3);
             }
             GenCodes(lengthLengths, lengthTree);
 
             var literalLengths = new int[287];
             ReadLengths(bitStream, lengthTree, literalLengths, hlit);
+            var literalTree = new HuffmanTree(literalTreeArray, 1 << literalLengths.Max() + 2);
             GenCodes(literalLengths, literalTree);
 
             var offsetLengths = new int[32];
             ReadLengths(bitStream, lengthTree, offsetLengths, hdist);
+            var offsetTree = new HuffmanTree(offsetTreeArray, 1 << offsetLengths.Max() + 2);
             GenCodes(offsetLengths, offsetTree);
-
-            Console.WriteLine(literalTree.ToString());
-            Console.WriteLine(offsetTree.ToString());
 
             var literalDecoder = literalTree.GetDecoder();
             var offsetDecoder = offsetTree.GetDecoder();
             while (true)
             {
-                byte bit;
-                if (!bitStream.ReadBits(out bit, (BitNum) 1))
-                    break;
+                var bit = bitStream.ReadBit();
                 var value = literalDecoder.Next(bit);
                 if (value < 0) continue;
-//                Console.WriteLine(value);
                 if (value < 256)
                 {
                     data.Add((byte) value);
                     continue;
                 }
                 if (value == 256) break;
-                var length = lengthStart[value - 257] + ReadBits(bitStream, lengthExtraBits[value - 257]);
+                var length = lengthStart[value - 257] + bitStream.ReadBits(lengthExtraBits[value - 257]);
                 var offsetId = FetchValue(bitStream, offsetDecoder);
                 var offset = offsetStart[offsetId];
-                offset += ReadBits(bitStream, offsetExtraBits[offsetId]);
-//                Console.WriteLine("<" + length + ", " + offset + ">");
+                offset += bitStream.ReadBits(offsetExtraBits[offsetId]);
                 for (var i = 0; i < length; i++)
                 {
                     data.Add(data[data.Count - offset]);
@@ -195,14 +176,13 @@ namespace BrutePack.Deflate
             }
         }
 
-        private static void ReadLengths(BitStream.BitStream stream, HuffmanTree tree, int[] lengths, int count)
+        private static void ReadLengths(BitReader stream, HuffmanTree tree, int[] lengths, int count)
         {
             var lengthsDecoder = tree.GetDecoder();
             var readLiterals = 0;
             while (readLiterals < count)
             {
-                byte bit;
-                stream.ReadBits(out bit, (BitNum) 1);
+                var bit = stream.ReadBit();
                 var value = lengthsDecoder.Next(bit);
                 if (value < 0) continue;
                 if (value < 16)
@@ -214,7 +194,7 @@ namespace BrutePack.Deflate
                 {
                     case 16:
                     {
-                        var extraBits = 3 + ReadBits(stream, 2);
+                        var extraBits = 3 + stream.ReadBits(2);
                         for (var i = 0; i < extraBits; i++)
                         {
                             lengths[readLiterals + i] = lengths[readLiterals - 1];
@@ -224,13 +204,13 @@ namespace BrutePack.Deflate
                     }
                     case 17:
                     {
-                        var extraBits = ReadBits(stream, 3);
+                        var extraBits = stream.ReadBits(3);
                         readLiterals += 3 + extraBits;
                         break;
                     }
                     case 18:
                     {
-                        var extraBits = ReadBits(stream, 7);
+                        var extraBits = stream.ReadBits(7);
                         readLiterals += 11 + extraBits;
                         break;
                     }
@@ -283,28 +263,24 @@ namespace BrutePack.Deflate
             return firstCode;
         }
 
-        private static void DecompressStatic(BitStream.BitStream bitStream, IList<byte> data)
+        private static void DecompressStatic(BitReader bitStream, IList<byte> data)
         {
             var decoder = HuffmanTree.StaticTree.GetDecoder();
             while (true)
             {
-                byte bit;
-                if (!bitStream.ReadBits(out bit, (BitNum) 1))
-                    break;
+                var bit = bitStream.ReadBit();
                 var value = decoder.Next(bit);
                 if (value < 0) continue;
-//                Console.WriteLine(value);
                 if (value < 256)
                 {
                     data.Add((byte) value);
                     continue;
                 }
                 if (value == 256) break;
-                var length = lengthStart[value - 257] + ReadBits(bitStream, lengthExtraBits[value - 257]);
-                var offsetId = ReadReversedBits(bitStream, 5);
+                var length = lengthStart[value - 257] + bitStream.ReadBits(lengthExtraBits[value - 257]);
+                var offsetId = bitStream.ReadReversedBits(5);
                 var offset = offsetStart[offsetId];
-                offset += ReadBits(bitStream, offsetExtraBits[offsetId]);
-//                Console.WriteLine("<" + length + ", " + offset + ">");
+                offset += bitStream.ReadBits(offsetExtraBits[offsetId]);
                 for (var i = 0; i < length; i++)
                 {
                     data.Add(data[data.Count - offset]);

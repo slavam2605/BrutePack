@@ -32,12 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BitStream, Version=1.0.0.3, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\BitStream.1.0.3\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10\BitStream.dll</HintPath>
-    </Reference>
-    <Reference Include="BitStream, Version=1.0.0.3, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\BitStream.1.0.3\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10\BitStream.dll</HintPath>
-    </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.1.5.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
       <HintPath>packages\JetBrains.Annotations.10.1.5\lib\net\JetBrains.Annotations.dll</HintPath>
     </Reference>
@@ -51,19 +45,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitStream\BitReader.cs" />
     <Compile Include="BrutePackMain.cs" />
     <Compile Include="Compression\Compressor.cs" />
     <Compile Include="Compression\DummyCompressor.cs" />
+    <Compile Include="DataStructure\BlockList.cs" />
     <Compile Include="Deflate\DeflateDecompressor.cs" />
     <Compile Include="GZip\GZipDecompressor.cs" />
     <Compile Include="Huffman\HuffmanTree.cs" />
+    <Compile Include="Huffman\HuffmanTreeTree.cs" />
+    <Compile Include="Huffman\HuffmanTreeSlow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="BitStream" />
     <Folder Include="Compression" />
+    <Folder Include="DataStructure" />
     <Folder Include="Deflate" />
     <Folder Include="GZip" />
     <Folder Include="Huffman" />

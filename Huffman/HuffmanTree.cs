@@ -1,85 +1,84 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace BrutePack.Huffman
 {
     public class HuffmanTree
     {
-        private readonly Dictionary<string, int> codes;
+        private readonly int[] tree;
         public static readonly HuffmanTree StaticTree;
 
         static HuffmanTree()
         {
-            StaticTree = new HuffmanTree();
-            for (int code = 48; code < 192; code++)
+            StaticTree = new HuffmanTree(new int[1024], 1024);
+            for (var code = 48; code < 192; code++)
             {
-                string stringCode = Convert.ToString(code, 2);
+                var stringCode = Convert.ToString(code, 2);
                 while (stringCode.Length < 8)
                     stringCode = "0" + stringCode;
                 StaticTree.AddCode(stringCode, code - 48);
             }
-            for (int code = 400; code < 512; code++)
+            for (var code = 400; code < 512; code++)
             {
-                string stringCode = Convert.ToString(code, 2);
+                var stringCode = Convert.ToString(code, 2);
                 StaticTree.AddCode(stringCode, code - 256);
             }
-            for (int code = 0; code < 24; code++)
+            for (var code = 0; code < 24; code++)
             {
-                string stringCode = Convert.ToString(code, 2);
+                var stringCode = Convert.ToString(code, 2);
                 while (stringCode.Length < 7)
                     stringCode = "0" + stringCode;
                 StaticTree.AddCode(stringCode, code + 256);
             }
-            for (int code = 192; code < 200; code++)
+            for (var code = 192; code < 200; code++)
             {
-                string stringCode = Convert.ToString(code, 2);
+                var stringCode = Convert.ToString(code, 2);
                 StaticTree.AddCode(stringCode, code + 88);
             }
         }
 
         public HuffmanTree()
         {
-            codes = new Dictionary<string, int>();
+            tree = new int[65536];
+            for (var i = 0; i < tree.Length; i++)
+                tree[i] = -1;
+        }
+
+        public HuffmanTree(int[] tree, int length)
+        {
+            this.tree = tree;
+            for (var i = 0; i < length; i++)
+                tree[i] = -1;
         }
 
         public void AddCode(string code, int value)
         {
-            codes[code] = value;
+            var index = code.Aggregate(0, (current, b) => 2 * current + 1 + (b - '0'));
+            tree[index] = value;
         }
 
         public HuffmanDecoder GetDecoder()
         {
-            return new HuffmanDecoder(this);
-        }
-
-        public override string ToString()
-        {
-            return string.Join(";", codes);
+            return new HuffmanDecoder(tree);
         }
 
         public class HuffmanDecoder
         {
-            private readonly HuffmanTree tree;
-            private string state = "";
+            private readonly int[] tree;
+            private int state;
 
-            public HuffmanDecoder(HuffmanTree tree)
+            public HuffmanDecoder(int[] tree)
             {
                 this.tree = tree;
+                state = 0;
             }
 
-            public int Next(int nextDigit)
+            public int Next(byte nextDigit)
             {
-                state += nextDigit;
-                int value;
-                try
-                {
-                    value = tree.codes[state];
-                    state = "";
-                }
-                catch (KeyNotFoundException e)
-                {
-                    value = -1;
-                }
+                state = 2 * state + 1 + nextDigit;
+                var value = tree[state];
+                if (value >= 0)
+                    state = 0;
                 return value;
             }
         }

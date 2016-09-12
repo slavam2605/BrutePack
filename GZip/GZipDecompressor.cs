@@ -17,7 +17,7 @@ namespace BrutePack.GZip
 
         public static void Decompress(Stream input, Stream output)
         {
-            byte[] buffer = new byte[10];
+            var buffer = new byte[10];
             input.Read(buffer, 0, 10);
             if (buffer[0] != 0x1F || buffer[1] != 0x8B)
                 throw new FormatException("Invalid gzip header");
@@ -28,19 +28,21 @@ namespace BrutePack.GZip
                 throw new NotSupportedException("Only FNAME flag is supported");
             // 4-7: MTIME
             int XFL = buffer[8];
-            if (XFL != 0)
-                throw new NotSupportedException("Extra flags are not supported");
+            if (XFL == 2)
+                Console.Out.WriteLine("Extra flag: best compression algorithm (XFL = 2)");
+            if (XFL == 4)
+                Console.Out.WriteLine("Extra flag: fastest compression algorithm (XFL = 4)");
             // 9: OS
             if ((FLG & FNAME) != 0)
             {
                 buffer = new byte[256];
-                int offset = 0;
+                var offset = 0;
                 do
                 {
                     input.Read(buffer, offset, 1);
                     offset++;
                 } while (buffer[offset - 1] != '\0');
-                string name = System.Text.Encoding.Default.GetString(buffer, 0, offset);
+                var name = System.Text.Encoding.ASCII.GetString(buffer, 0, offset);
                 Console.WriteLine("filename=" + name);
             }
             DeflateDecompressor.Decompress(input, output);
