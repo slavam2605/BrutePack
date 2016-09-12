@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BigRationalLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\BigRationalLibrary.1.0.0.0\lib\NETFramework40\BigRationalLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="BitStream, Version=1.0.0.3, Culture=neutral, PublicKeyToken=null">
       <HintPath>packages\BitStream.1.0.3\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10\BitStream.dll</HintPath>
     </Reference>
@@ -44,6 +47,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -51,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArithmeticCoding\ArithmeticCoder.cs" />
     <Compile Include="BrutePackMain.cs" />
     <Compile Include="Compression\Compressor.cs" />
     <Compile Include="Compression\DummyCompressor.cs" />
@@ -63,6 +68,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ArithmeticCoding" />
     <Folder Include="Compression" />
     <Folder Include="Deflate" />
     <Folder Include="GZip" />
