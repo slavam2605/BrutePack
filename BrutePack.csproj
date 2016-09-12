@@ -32,12 +32,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BigRationalLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\BigRationalLibrary.1.0.0.0\lib\NETFramework40\BigRationalLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.1.5.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
       <HintPath>packages\JetBrains.Annotations.10.1.5\lib\net\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitStream\BitReader.cs" />
+    <Compile Include="ArithmeticCoding\ArithmeticCoder.cs" />
     <Compile Include="BrutePackMain.cs" />
     <Compile Include="Compression\Compressor.cs" />
     <Compile Include="Compression\DummyCompressor.cs" />
@@ -62,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BitStream" />
+    <Folder Include="ArithmeticCoding" />
     <Folder Include="Compression" />
     <Folder Include="DataStructure" />
     <Folder Include="Deflate" />
