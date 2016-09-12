@@ -49,6 +49,12 @@ namespace BrutePack.Deflate
 
         private static int ReadReversedBits(BitStream.BitStream stream, int bits)
         {
+            if (bits <= 8)
+            {
+                byte bvalue;
+                stream.ReadBits(out bvalue, (BitNum) bits);
+                return bvalue;
+            }
             var value = 0;
             for (var i = 0; i < bits; i++)
             {
@@ -66,10 +72,16 @@ namespace BrutePack.Deflate
             {
                 byte bit;
                 stream.ReadBits(out bit, (BitNum) 1);
-                int value = decoder.Next(bit);
+                var value = decoder.Next(bit);
                 if (value >= 0)
                     return value;
             }
+        }
+
+        private static void FinishByte(BitStream.BitStream stream)
+        {
+            byte rest;
+            stream.ReadBits(out rest, (BitNum) (8 - stream.BitPosition));
         }
 
         public static void Decompress(Stream input, Stream output)
@@ -89,7 +101,8 @@ namespace BrutePack.Deflate
                 switch (btype)
                 {
                     case 0:
-                        throw new NotSupportedException("Not compressed blocks are not supported");
+                        DecompressCopy(bitStream, data);
+                        break;
                     case 1:
                         DecompressStatic(bitStream, data);
                         break;
@@ -107,6 +120,12 @@ namespace BrutePack.Deflate
 //                Console.Write((char) aByte);
 //            }
 //            Console.WriteLine("\"");
+        }
+
+        private static void DecompressCopy(BitStream.BitStream bitStream, IList<byte> data)
+        {
+            FinishByte(bitStream);
+
         }
 
         private static void DecompressDynamic(BitStream.BitStream bitStream, IList<byte> data)
@@ -157,7 +176,7 @@ namespace BrutePack.Deflate
                     break;
                 var value = literalDecoder.Next(bit);
                 if (value < 0) continue;
-                Console.WriteLine(value);
+//                Console.WriteLine(value);
                 if (value < 256)
                 {
                     data.Add((byte) value);
@@ -168,7 +187,7 @@ namespace BrutePack.Deflate
                 var offsetId = FetchValue(bitStream, offsetDecoder);
                 var offset = offsetStart[offsetId];
                 offset += ReadBits(bitStream, offsetExtraBits[offsetId]);
-                Console.WriteLine("<" + length + ", " + offset + ">");
+//                Console.WriteLine("<" + length + ", " + offset + ">");
                 for (var i = 0; i < length; i++)
                 {
                     data.Add(data[data.Count - offset]);
@@ -195,7 +214,12 @@ namespace BrutePack.Deflate
                 {
                     case 16:
                     {
-                        throw new NotImplementedException();
+                        var extraBits = 3 + ReadBits(stream, 2);
+                        for (var i = 0; i < extraBits; i++)
+                        {
+                            lengths[readLiterals + i] = lengths[readLiterals - 1];
+                        }
+                        readLiterals += extraBits;
                         break;
                     }
                     case 17:
@@ -269,7 +293,7 @@ namespace BrutePack.Deflate
                     break;
                 var value = decoder.Next(bit);
                 if (value < 0) continue;
-                Console.WriteLine(value);
+//                Console.WriteLine(value);
                 if (value < 256)
                 {
                     data.Add((byte) value);
@@ -280,7 +304,7 @@ namespace BrutePack.Deflate
                 var offsetId = ReadReversedBits(bitStream, 5);
                 var offset = offsetStart[offsetId];
                 offset += ReadBits(bitStream, offsetExtraBits[offsetId]);
-                Console.WriteLine("<" + length + ", " + offset + ">");
+//                Console.WriteLine("<" + length + ", " + offset + ">");
                 for (var i = 0; i < length; i++)
                 {
                     data.Add(data[data.Count - offset]);

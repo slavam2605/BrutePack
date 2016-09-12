@@ -13,8 +13,8 @@ namespace BrutePack
             try
             {
                 GZipDecompressor.Decompress(
-                    new FileStream("C:\\Users\\slava\\test.bmp.gz", FileMode.Open)
-                    , new FileStream("C:\\Users\\slava\\test.bmp", FileMode.Create)
+                    new FileStream("C:\\Users\\slava\\test.gif.gz", FileMode.Open)
+                    , new FileStream("C:\\Users\\slava\\test.gif", FileMode.Create)
                 );
             }
             catch (Exception e)
