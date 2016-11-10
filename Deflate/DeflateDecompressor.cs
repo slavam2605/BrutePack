@@ -58,8 +58,8 @@ namespace BrutePack.Deflate
             return buffer;
         }
 
-        public static int[] literalTreeArray = new int[65536];
-        public static int[] offsetTreeArray = new int[65536];
+        public static int[] LiteralTreeArray = new int[65536];
+        public static int[] OffsetTreeArray = new int[65536];
 
         public static void Decompress(Stream input, Stream output)
         {
@@ -144,12 +144,12 @@ namespace BrutePack.Deflate
 
             var literalLengths = new int[287];
             ReadLengths(bitStream, lengthTree, literalLengths, hlit);
-            var literalTree = new HuffmanTree(literalTreeArray, 1 << literalLengths.Max() + 2);
+            var literalTree = new HuffmanTree(LiteralTreeArray, (1 << literalLengths.Max()) + 2);
             GenCodes(literalLengths, literalTree);
 
             var offsetLengths = new int[32];
             ReadLengths(bitStream, lengthTree, offsetLengths, hdist);
-            var offsetTree = new HuffmanTree(offsetTreeArray, 1 << offsetLengths.Max() + 2);
+            var offsetTree = new HuffmanTree(OffsetTreeArray, (1 << offsetLengths.Max()) + 2);
             GenCodes(offsetLengths, offsetTree);
 
             var literalDecoder = literalTree.GetDecoder();
@@ -176,7 +176,7 @@ namespace BrutePack.Deflate
             }
         }
 
-        private static void ReadLengths(BitReader stream, HuffmanTree tree, int[] lengths, int count)
+        private static void ReadLengths(BitReader stream, HuffmanTree tree, IList<int> lengths, int count)
         {
             var lengthsDecoder = tree.GetDecoder();
             var readLiterals = 0;
