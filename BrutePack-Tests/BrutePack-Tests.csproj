@@ -35,6 +35,9 @@
     <Reference Include="BitStream, Version=1.0.0.3, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\BitStream.1.0.3\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+MonoTouch10\BitStream.dll</HintPath>
     </Reference>
+    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32">
+      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
       <HintPath>..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
