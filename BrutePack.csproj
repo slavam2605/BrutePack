@@ -32,14 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BigRationalLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\BigRationalLibrary.1.0.0.0\lib\NETFramework40\BigRationalLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32">
       <HintPath>packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
     </Reference>
-    <Reference Include="Gnu.MP, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>lib\Gnu.MP.dll</HintPath>
-    </Reference>
-    <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
-      <HintPath>packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
+    <Reference Include="JetBrains.Annotations, Version=10.1.5.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
+      <HintPath>packages\JetBrains.Annotations.10.1.5\lib\net\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -58,7 +58,9 @@
     <Compile Include="Compression\Compressor.cs" />
     <Compile Include="Compression\DummyCompressor.cs" />
     <Compile Include="DataStructure\BlockList.cs" />
+    <Compile Include="Deflate\CopyDeflateCompressor.cs" />
     <Compile Include="Deflate\DeflateDecompressor.cs" />
+    <Compile Include="GZip\GZipCompressor.cs" />
     <Compile Include="GZip\GZipDecompressor.cs" />
     <Compile Include="Huffman\HuffmanTree.cs" />
     <Compile Include="Huffman\HuffmanTreeTree.cs" />
@@ -66,16 +68,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="BitStream" />
     <Folder Include="ArithmeticCoding" />
     <Folder Include="Compression" />
     <Folder Include="DataStructure" />
-    <Folder Include="Deflate" />
-    <Folder Include="GZip" />
     <Folder Include="Huffman" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

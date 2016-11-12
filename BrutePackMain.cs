@@ -42,12 +42,22 @@ namespace BrutePack
             }
             try
             {
-                var stopwatch = Stopwatch.StartNew();
-                GZipDecompressor.Decompress(
-                    new FileStream(inputFile, FileMode.Open)
-                    , new FileStream(outputFile, FileMode.Create)
-                );
-                Console.Out.WriteLine("Time elapsed: " + stopwatch.Elapsed);
+                if (decompress)
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    GZipDecompressor.Decompress(
+                        new FileStream(inputFile, FileMode.Open),
+                        new FileStream(outputFile, FileMode.Create)
+                    );
+                    Console.Out.WriteLine("Time elapsed: " + stopwatch.Elapsed);
+                }
+                else
+                {
+                    GZipCompressor.Compress(
+                        new FileStream(inputFile, FileMode.Open),
+                        new FileStream(outputFile, FileMode.Create)
+                    );
+                }
             }
             catch (Exception e)
             {
@@ -71,7 +81,7 @@ namespace BrutePack
             }
             else
             {
-                outputFile = inputFile + ".o";
+                outputFile = inputFile + ".gz";
             }
         }
     }

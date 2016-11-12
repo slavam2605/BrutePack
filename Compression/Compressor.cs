@@ -2,7 +2,7 @@
 
 namespace BrutePack.Compression
 {
-    public interface Compressor
+    public interface ICompressor
     {
         void Compress(Stream inStream, Stream outStream);
     }

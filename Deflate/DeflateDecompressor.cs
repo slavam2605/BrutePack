@@ -5,6 +5,7 @@ using System.Linq;
 using BrutePack.BitStream;
 using BrutePack.DataStructure;
 using BrutePack.Huffman;
+using JetBrains.Annotations;
 
 namespace BrutePack.Deflate
 {
@@ -65,6 +66,7 @@ namespace BrutePack.Deflate
         {
             var bitStream = new BitReader(input);
             var data = new List<byte>();
+//            var data = new BlockList<byte>();
             byte bfinal;
             do
             {
