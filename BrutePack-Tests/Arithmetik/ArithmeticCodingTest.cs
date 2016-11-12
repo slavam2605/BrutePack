@@ -26,7 +26,6 @@ namespace BrutePack_Tests.Arithmetic
             Console.WriteLine(resultString);
             Assert.LessOrEqual(encodedData.Length, data.Length);
             Assert.AreEqual(testString, resultString);
-
         }
 
         [Test]

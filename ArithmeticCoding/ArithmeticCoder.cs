@@ -2,18 +2,28 @@
 using System.IO;
 using System.Numerics;
 using System.Xml.Schema;
-using Numerics;
+using Gnu.MP;
 
 namespace BrutePack.ArithmeticCoding
 {
     public static class ArithmeticCoder
     {
-        private static BigRational[] BuildFrequencyTable(int[] frequencies, int totalSize)
+        public static Rational GetWholePart(this Rational num)
         {
-            var frequencyPoints = new BigRational[257];
-            frequencyPoints[0] = new BigRational(0d);
+            return num - num.GetFractionPart();
+        }
+
+        public static Rational GetFractionPart(this Rational num)
+        {
+            return new Rational(num.Numerator % num.Denumerator, num.Denumerator);
+        }
+
+        private static Rational[] BuildFrequencyTable(int[] frequencies, int totalSize)
+        {
+            var frequencyPoints = new Rational[257];
+            frequencyPoints[0] = new Rational(0d);
             for (int i = 1; i < 257; i++)
-                frequencyPoints[i] = frequencyPoints[i - 1] + new BigRational(frequencies[i - 1], totalSize);
+                frequencyPoints[i] = frequencyPoints[i - 1] + new Rational(frequencies[i - 1], totalSize);
             return frequencyPoints;
         }
 
@@ -39,8 +49,9 @@ namespace BrutePack.ArithmeticCoding
 
         public static byte[] Encode(byte[] data, int[] frequencies, int dataLength)
         {
-            var leftBound = new BigRational(0d);
-            var rightBound = new BigRational(256, 1);
+            var leftBound2 = new Rational(0);
+            var leftBound = new Rational(0d);
+            var rightBound = new Rational(256, 1);
             var frequencyPoints = BuildFrequencyTable(frequencies, dataLength);
             var outStream = new MemoryStream();
 
@@ -73,10 +84,10 @@ namespace BrutePack.ArithmeticCoding
 
         public static byte[] Decode(byte[] data, int[] frequencies, int outputSize)
         {
-            var leftBound = new BigRational(0d);
-            var rightBound = new BigRational(1, 1);
+            var leftBound = new Rational(0d);
+            var rightBound = new Rational(1, 1);
             var frequencyPoints = BuildFrequencyTable(frequencies, outputSize);
-            var point = new BigRational(0d);
+            var point = new Rational(0d);
             for (int i = data.Length - 1; i >= 0; i--)
                 point = (point + data[i]) / 256;
 
