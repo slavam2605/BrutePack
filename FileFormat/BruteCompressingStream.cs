@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BrutePack.FileFormat.CompressionStrategy;
 
 namespace BrutePack.FileFormat
 {
@@ -8,10 +9,12 @@ namespace BrutePack.FileFormat
         private readonly BinaryWriter internalWriter;
         private readonly byte[] internalBuffer;
         private int bufferOffset;
+        private readonly ICompressionStrategy compressionStrategy;
 
-        public BruteCompressingStream(BinaryWriter internalWriter, int maxBufferSize)
+        public BruteCompressingStream(BinaryWriter internalWriter, int maxBufferSize, ICompressionStrategy compressionStrategy)
         {
             this.internalWriter = internalWriter;
+            this.compressionStrategy = compressionStrategy;
             internalBuffer = new byte[maxBufferSize];
             bufferOffset = 0;
         }
@@ -25,8 +28,10 @@ namespace BrutePack.FileFormat
         {
             if (bufferOffset > 0)
             {
-                var compressedBlock = BlockCompressor.CompressBlock(internalBuffer, bufferOffset);
-                internalWriter.WriteBrutePackBlock(compressedBlock);
+                var compressedBlock = compressionStrategy.CompressBlock(internalBuffer, bufferOffset);
+                if(!compressedBlock.HasValue)
+                    throw new ApplicationException("Unable to compress a block"); // todo: proper exception?
+                internalWriter.WriteBrutePackBlock(compressedBlock.Value);
                 bufferOffset = 0;
             }
             if (flushUnderlyingStream)
@@ -56,6 +61,7 @@ namespace BrutePack.FileFormat
                 Array.Copy(buffer, offset, internalBuffer, bufferOffset, copySize);
                 count -= copySize;
                 offset += copySize;
+                bufferOffset += copySize;
                 if (bufferOffset == internalBuffer.Length)
                     FlushInternal(false);
             }

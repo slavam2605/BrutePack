@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace BrutePack.FileFormat
+namespace BrutePack.FileFormat.CompressionStrategy
 {
-    public static class BlockCompressor
+    public class DumbCompressionStrategy : ICompressionStrategy
     {
-        public static BrutePackBlock CompressBlock(byte[] data, int length)
+        public BrutePackBlock? CompressBlock(byte[] data, int length)
         {
             if(length > 65535 || length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));

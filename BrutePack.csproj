@@ -63,12 +63,16 @@
     <Compile Include="DataStructure\BlockList.cs" />
     <Compile Include="Deflate\CopyDeflateCompressor.cs" />
     <Compile Include="Deflate\DeflateDecompressor.cs" />
-    <Compile Include="FileFormat\BlockCompressor.cs" />
+    <Compile Include="ExternalCompressor\ExternalCompressionStrategy.cs" />
+    <Compile Include="ExternalCompressor\ExternalCompressorConfig.cs" />
     <Compile Include="FileFormat\BlockDecompressor.cs" />
     <Compile Include="FileFormat\BlockType.cs" />
     <Compile Include="FileFormat\BruteCompressingStream.cs" />
     <Compile Include="FileFormat\BrutePackFile.cs" />
     <Compile Include="FileFormat\BruteUncompressingStream.cs" />
+    <Compile Include="FileFormat\CompressionStrategy\BruteCompressionStrategy.cs" />
+    <Compile Include="FileFormat\CompressionStrategy\DumbCompressionStrategy.cs" />
+    <Compile Include="FileFormat\CompressionStrategy\ICompressionStrategy.cs" />
     <Compile Include="GZip\GZipCompressor.cs" />
     <Compile Include="GZip\GZipDecompressor.cs" />
     <Compile Include="Huffman\HuffmanTree.cs" />
@@ -84,6 +88,8 @@
     <Folder Include="ArithmeticCoding" />
     <Folder Include="Compression" />
     <Folder Include="DataStructure" />
+    <Folder Include="ExternalCompressor" />
+    <Folder Include="FileFormat" />
     <Folder Include="Huffman" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
