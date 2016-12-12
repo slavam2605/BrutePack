@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arithmetik\ArithmeticCodingTest.cs" />
+    <Compile Include="BruteStrategy\BruteStrategyTest.cs" />
     <Compile Include="ExternalCompression\ExternalCompressorTest.cs" />
     <Compile Include="FileFormat\ReadWriteTest.cs" />
     <Compile Include="GZip\GZipTest.cs" />

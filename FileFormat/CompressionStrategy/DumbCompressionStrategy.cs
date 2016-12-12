@@ -1,4 +1,5 @@
 ﻿using System;
+using BrutePack.Decompression;
 
 namespace BrutePack.FileFormat.CompressionStrategy
 {
@@ -12,6 +13,15 @@ namespace BrutePack.FileFormat.CompressionStrategy
             byte[] newData = new byte[length];
             Array.Copy(data, newData, length);
             return new BrutePackBlock(BlockType.Uncompressed, newData);
+        }
+    }
+
+    [DecompressionProvider(BlockType.Uncompressed)]
+    public class DumbDecompressor : IDecompressionProvider
+    {
+        public byte[] Decompress(BrutePackBlock block)
+        {
+            return block.BlockData;
         }
     }
 }

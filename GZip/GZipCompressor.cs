@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using BrutePack.Compression;
 using BrutePack.Deflate;
 
 namespace BrutePack.GZip

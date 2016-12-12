@@ -59,15 +59,16 @@
     <Compile Include="ArithmeticCoding\ArithmeticCoder.cs" />
     <Compile Include="BitStream\BitWriter.cs" />
     <Compile Include="BrutePackMain.cs" />
-    <Compile Include="Compression\Compressor.cs" />
-    <Compile Include="Compression\DummyCompressor.cs" />
     <Compile Include="Crc\Crc32.cs" />
     <Compile Include="DataStructure\BlockList.cs" />
+    <Compile Include="Decompression\DecompressionProviderAttribute.cs" />
+    <Compile Include="Decompression\IDecompressionProvider.cs" />
     <Compile Include="Deflate\CopyDeflateCompressor.cs" />
     <Compile Include="Deflate\DeflateDecompressor.cs" />
     <Compile Include="Deflate\StaticHuffmanDeflateCompressor.cs" />
     <Compile Include="ExternalCompressor\ExternalCompressionStrategy.cs" />
     <Compile Include="ExternalCompressor\ExternalCompressorConfig.cs" />
+    <Compile Include="ExternalCompressor\ExternalDecompressionProvider.cs" />
     <Compile Include="FileFormat\BlockDecompressor.cs" />
     <Compile Include="FileFormat\BlockType.cs" />
     <Compile Include="FileFormat\BruteCompressingStream.cs" />
@@ -90,9 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ArithmeticCoding" />
-    <Folder Include="Compression" />
     <Folder Include="DataStructure" />
-    <Folder Include="ExternalCompressor" />
     <Folder Include="FileFormat" />
     <Folder Include="Huffman" />
   </ItemGroup>

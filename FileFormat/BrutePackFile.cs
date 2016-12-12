@@ -7,7 +7,7 @@ namespace BrutePack.FileFormat
     {
         public BrutePackBlock(BlockType blockType, byte[] blockData)
         {
-            if (blockData.Length > 65536)
+            if (blockData.Length >= 65536)
                 throw new ArgumentOutOfRangeException(nameof(blockData));
             BlockType = blockType;
             BlockData = blockData;

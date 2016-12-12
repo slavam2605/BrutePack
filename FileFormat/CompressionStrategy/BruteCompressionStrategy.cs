@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace BrutePack.FileFormat.CompressionStrategy
 {
@@ -6,9 +7,9 @@ namespace BrutePack.FileFormat.CompressionStrategy
     {
         private readonly List<ICompressionStrategy> subStrategies;
 
-        public BruteCompressionStrategy(List<ICompressionStrategy> subStrategies)
+        public BruteCompressionStrategy(IEnumerable<ICompressionStrategy> subStrategies)
         {
-            this.subStrategies = subStrategies;
+            this.subStrategies = subStrategies.ToList();
         }
 
         public BrutePackBlock? CompressBlock(byte[] data, int length)
@@ -21,6 +22,7 @@ namespace BrutePack.FileFormat.CompressionStrategy
                 if (compressed != null && compressed.Value.BlockData.Length < minSize)
                 {
                     bestBlock = compressed;
+                    minSize = compressed.Value.BlockData.Length;
                 }
             }
             return bestBlock;

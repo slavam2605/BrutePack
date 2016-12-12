@@ -1,51 +1,46 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using BrutePack.Decompression;
 using BrutePack.ExternalCompressor;
 
 namespace BrutePack.FileFormat
 {
-    public class BlockDecompressor
+    public static class BlockDecompressor
     {
-        public static byte[] Decompress(BrutePackBlock block)
+        private static Dictionary<BlockType, IDecompressionProvider> typeToProvider =
+            new Dictionary<BlockType, IDecompressionProvider>();
+
+        static BlockDecompressor()
         {
-            switch (block.BlockType)
+            var assembly = Assembly.GetExecutingAssembly();
+            foreach (var type in assembly.DefinedTypes)
             {
-                case BlockType.Uncompressed:
-                    return block.BlockData;
-                case BlockType.External:
-                    return DecompressExternalBlock(block);
-                default:
-                    throw new NotImplementedException("Unknown block type " + block.BlockType + " not supported");
+                var attrib = type.GetCustomAttribute<DecompressionProviderAttribute>(false);
+                if (attrib != null)
+                {
+                    if (typeToProvider.ContainsKey(attrib.TargetType))
+                        throw new ApplicationException(
+                            $"Multiple classes containt the DecompressionProvider attribute for {attrib.TargetType}: {typeToProvider[attrib.TargetType].GetType().Name} and {type.Name}");
+                    var primaryConstructor = type.GetConstructor(new Type[0]);
+                    if (primaryConstructor != null)
+                        typeToProvider[attrib.TargetType] =
+                            (IDecompressionProvider) primaryConstructor.Invoke(new object[0]);
+                    else
+                        throw new ApplicationException(
+                            $"Class with DecompressionProvider for {attrib.TargetType} ({type.Name}) doesn't have parameterless constructor");
+                }
             }
         }
 
-        private static byte[] DecompressExternalBlock(BrutePackBlock block)
+        public static byte[] Decompress(BrutePackBlock block)
         {
-            var memStream = new MemoryStream(block.BlockData);
-            var reader = new BinaryReader(memStream);
-            var decompressProg = reader.ReadString();
-
-            var split = decompressProg.Split(new[] {' '}, 2);
-            var processStart = new ProcessStartInfo(split[0], split.Length > 1 ? split[1] : "");
-            processStart.RedirectStandardInput = true;
-            processStart.RedirectStandardOutput = true;
-            processStart.UseShellExecute = false;
-            processStart.CreateNoWindow = true;
-            var cproc = Process.Start(processStart);
-            if (cproc == null)
-                throw new InvalidProgramException();
-
-            var writeTask = cproc.StandardInput.BaseStream.WriteAsync(block.BlockData, (int) memStream.Position, block.BlockData.Length - (int) memStream.Position);
-            writeTask.ContinueWith(_ => cproc.StandardInput.BaseStream.Close());
-
-            var memOutput = new MemoryStream();
-            var readTask = ExternalCompressionStrategy.CopyStreamTo(cproc.StandardOutput.BaseStream, memOutput);
-
-            writeTask.Wait();
-            readTask.Wait();
-
-            return memOutput.ToArray();
+            IDecompressionProvider decomp;
+            if(!typeToProvider.TryGetValue(block.BlockType, out decomp))
+                throw new ApplicationException("Unknown block type: " + block.BlockType);
+            return decomp.Decompress(block);
         }
     }
 }
