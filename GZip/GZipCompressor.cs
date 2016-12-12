@@ -29,7 +29,8 @@ namespace BrutePack.GZip
             buffer[8] = 0;    // no XFLG
             buffer[9] = 11;   // NTFS filesystem
             outStream.Write(buffer, 0, buffer.Length);
-            var crcCount = CopyDeflateCompressor.Compress(inStream, outStream);
+//            var crcCount = CopyDeflateCompressor.Compress(inStream, outStream);
+            var crcCount = StaticHuffmanDeflateCompressor.Compress(inStream, outStream);
             buffer = new byte[4];
             buffer[0] = (byte) (crcCount.Item1 & 0xFF);
             buffer[1] = (byte) ((crcCount.Item1 >> 8) & 0xFF);

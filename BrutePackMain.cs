@@ -29,6 +29,16 @@ namespace BrutePack
             return HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));
         }
 
+        public static void PrintInt(int x)
+        {
+            for (var i = 0; i < 32; i++)
+            {
+                Console.Write(x & 1);
+                x >>= 1;
+            }
+            Console.WriteLine();
+        }
+
         public static void Main(string[] args)
         {
             var brutePackMain = new BrutePackMain();
@@ -42,14 +52,13 @@ namespace BrutePack
             }
             try
             {
+                var stopwatch = Stopwatch.StartNew();
                 if (decompress)
                 {
-                    var stopwatch = Stopwatch.StartNew();
                     GZipDecompressor.Decompress(
                         new FileStream(inputFile, FileMode.Open),
                         new FileStream(outputFile, FileMode.Create)
                     );
-                    Console.Out.WriteLine("Time elapsed: " + stopwatch.Elapsed);
                 }
                 else
                 {
@@ -58,6 +67,7 @@ namespace BrutePack
                         new FileStream(outputFile, FileMode.Create)
                     );
                 }
+                Console.Out.WriteLine("Time elapsed: " + stopwatch.Elapsed);
             }
             catch (Exception e)
             {

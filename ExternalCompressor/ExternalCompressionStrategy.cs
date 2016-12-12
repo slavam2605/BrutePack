@@ -27,6 +27,7 @@ namespace BrutePack.ExternalCompressor
             processStart.RedirectStandardInput = true;
             processStart.RedirectStandardOutput = true;
             processStart.UseShellExecute = false;
+            processStart.CreateNoWindow = true;
             var cproc = Process.Start(processStart);
             if (cproc == null)
                 throw new InvalidProgramException();

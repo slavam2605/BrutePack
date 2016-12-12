@@ -39,7 +39,7 @@
       <HintPath>packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
     </Reference>
     <Reference Include="Gnu.MP, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>bin\Debug\Gnu.MP.dll</HintPath>
+      <HintPath>lib\Gnu.MP.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
       <HintPath>packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
@@ -57,12 +57,15 @@
   <ItemGroup>
     <Compile Include="BitStream\BitReader.cs" />
     <Compile Include="ArithmeticCoding\ArithmeticCoder.cs" />
+    <Compile Include="BitStream\BitWriter.cs" />
     <Compile Include="BrutePackMain.cs" />
     <Compile Include="Compression\Compressor.cs" />
     <Compile Include="Compression\DummyCompressor.cs" />
+    <Compile Include="Crc\Crc32.cs" />
     <Compile Include="DataStructure\BlockList.cs" />
     <Compile Include="Deflate\CopyDeflateCompressor.cs" />
     <Compile Include="Deflate\DeflateDecompressor.cs" />
+    <Compile Include="Deflate\StaticHuffmanDeflateCompressor.cs" />
     <Compile Include="ExternalCompressor\ExternalCompressionStrategy.cs" />
     <Compile Include="ExternalCompressor\ExternalCompressorConfig.cs" />
     <Compile Include="FileFormat\BlockDecompressor.cs" />
@@ -73,18 +76,19 @@
     <Compile Include="FileFormat\CompressionStrategy\BruteCompressionStrategy.cs" />
     <Compile Include="FileFormat\CompressionStrategy\DumbCompressionStrategy.cs" />
     <Compile Include="FileFormat\CompressionStrategy\ICompressionStrategy.cs" />
+    <Compile Include="GZip\GZipCompressionStrategy.cs" />
     <Compile Include="GZip\GZipCompressor.cs" />
     <Compile Include="GZip\GZipDecompressor.cs" />
     <Compile Include="Huffman\HuffmanTree.cs" />
     <Compile Include="Huffman\HuffmanTreeTree.cs" />
     <Compile Include="Huffman\HuffmanTreeSlow.cs" />
+    <Compile Include="LempelZiv\LZ77.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="BitStream" />
     <Folder Include="ArithmeticCoding" />
     <Folder Include="Compression" />
     <Folder Include="DataStructure" />

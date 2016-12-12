@@ -1,15 +1,20 @@
 ﻿using System;
 using System.IO;
 using BrutePack.Crc;
+using BrutePack.LempelZiv;
 
 namespace BrutePack.Deflate
 {
-    public class CopyDeflateCompressor
+    public class StaticHuffmanDeflateCompressor
     {
         public static Tuple<uint, uint> Compress(Stream inStream, Stream outStream)
         {
             var crc = Crc32.InitCrc();
             var count = 0u;
+            var bitOut = new BitStream.BitWriter(outStream);
+            var lookupPair = Huffman.HuffmanTree.StaticTree.GetLookupTable(287);
+            var codeTable = lookupPair.Item1;
+            var lengthTable = lookupPair.Item2;
             while (true)
             {
                 var buffer = new byte[(1 << 16) - 1];
@@ -26,15 +31,17 @@ namespace BrutePack.Deflate
                 {
                     Crc32.NextCrc(ref crc, buffer[i]);
                 }
-                var tempBuffer = new byte[5];
-                tempBuffer[0] = (byte) (size < (1 << 16) - 1 ? 1 : 0);
-                tempBuffer[1] = (byte) (size & 0xFF);
-                tempBuffer[2] = (byte) (size >> 8);
-                tempBuffer[3] = (byte) ~tempBuffer[1];
-                tempBuffer[4] = (byte) ~tempBuffer[2];
-                outStream.Write(tempBuffer, 0, tempBuffer.Length);
-                outStream.Write(buffer, 0, size);
+                var lzCompressed = LZ77.Compress(buffer, size);
+                bitOut.WriteBits(2, 3);
+                for (var i = 0; i < size; i++)
+                {
+                    bitOut.WriteBits(codeTable[lzCompressed[i]], lengthTable[lzCompressed[i]]);
+                }
+                bitOut.WriteBits(codeTable[256], lengthTable[256]);
             }
+            bitOut.WriteBits(3, 3);
+            bitOut.WriteBits(codeTable[256], lengthTable[256]);
+            bitOut.Flush();
             Crc32.FinishCrc(ref crc);
             return new Tuple<uint, uint>(crc, count);
         }

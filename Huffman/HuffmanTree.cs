@@ -1,5 +1,8 @@
 ﻿using System;
+using System.ComponentModel.Design;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace BrutePack.Huffman
 {
@@ -35,6 +38,45 @@ namespace BrutePack.Huffman
                 var stringCode = Convert.ToString(code, 2);
                 StaticTree.AddCode(stringCode, code + 88);
             }
+        }
+
+        public Tuple<int[], int[]> GetLookupTable(int maxCode)
+        {
+            var code = new int[maxCode + 1];
+            var codeLenghts = new int[maxCode + 1];
+            Dfs(ref code, ref codeLenghts, 0, 0);
+            return Tuple.Create(code, codeLenghts);
+        }
+
+        private void Dfs(ref int[] code, ref int[] codeLenghts, int state, int length)
+        {
+            if (tree[state] >= 0)
+            {
+                code[tree[state]] = ReverseInt(state - ((1 << length) - 1), length);
+                codeLenghts[tree[state]] = length;
+            }
+            else
+            {
+                Dfs(ref code, ref codeLenghts, 2 * state + 1, length + 1);
+                Dfs(ref code, ref codeLenghts, 2 * state + 2, length + 1);
+            }
+        }
+
+        public static int ReverseInt(int x, int length)
+        {
+            ReverseInt(ref x);
+            return (int) ((uint) x >> (32 - length));
+        }
+
+        public static void ReverseInt(ref int x)
+        {
+            var acc = 0;
+            for (var i = 0; i < 32; i++)
+            {
+                acc = (acc << 1) + (x & 1);
+                x >>= 1;
+            }
+            x = acc;
         }
 
         public HuffmanTree()

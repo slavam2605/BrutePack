@@ -21,7 +21,7 @@ namespace BrutePack_Tests.ExternalCompression
         [Test]
         public void TestCompressionWithGzip()
         {
-            TestCompressionWithConfig(new ExternalCompressorConfig("gzip -9 -", "gunzip -"), true);
+            TestCompressionWithConfig(new ExternalCompressorConfig("gzip -9 -", "gzip -d -"), true);
         }
 
 
