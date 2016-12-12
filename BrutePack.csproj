@@ -79,6 +79,7 @@
     <Compile Include="FileFormat\CompressionStrategy\ICompressionStrategy.cs" />
     <Compile Include="GZip\GZipCompressionStrategy.cs" />
     <Compile Include="GZip\GZipCompressor.cs" />
+    <Compile Include="GZip\GZipDecompressionProvider.cs" />
     <Compile Include="GZip\GZipDecompressor.cs" />
     <Compile Include="Huffman\HuffmanTree.cs" />
     <Compile Include="Huffman\HuffmanTreeTree.cs" />
