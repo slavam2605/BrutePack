@@ -9,20 +9,20 @@ namespace BrutePack.ExternalCompressor
 {
     public class ExternalCompressionStrategy : ICompressionStrategy
     {
-        private readonly ExternalCompressorConfig config;
+        public ExternalCompressorConfig Config { get; }
 
         public ExternalCompressionStrategy(ExternalCompressorConfig config)
         {
-            this.config = config;
+            this.Config = config;
         }
 
         public BrutePackBlock? CompressBlock(byte[] data, int length)
         {
             MemoryStream memStream = new MemoryStream();
             var writer = new BinaryWriter(memStream);
-            writer.Write(config.UncompressCommand);
+            writer.Write(Config.UncompressCommand);
 
-            var split = config.CompressCommand.Split(new[] {' '}, 2);
+            var split = Config.CompressCommand.Split(new[] {' '}, 2);
             var processStart = new ProcessStartInfo(split[0], split.Length > 1 ? split[1] : "");
             processStart.RedirectStandardInput = true;
             processStart.RedirectStandardOutput = true;

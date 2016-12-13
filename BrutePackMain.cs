@@ -1,7 +1,13 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using BrutePack.CompressionStrategy;
+using BrutePack.FileFormat;
 using BrutePack.GZip;
+using BrutePack.StrategyConfig;
+using BrutePack.Util;
 using CommandLine;
 using CommandLine.Text;
 
@@ -18,20 +24,19 @@ namespace BrutePack
         [Option('d', "decompress", DefaultValue = false, HelpText = "Decompress mode")]
         public bool Decompress { get; set; }
 
+        [Option('c', "config", MutuallyExclusiveSet = "f", HelpText = "Compression configuration string")]
+        public string ConfigString { get; set; }
+
+        [Option('f', "file", MutuallyExclusiveSet = "c", HelpText = "Compression configuration file")]
+        public string ConfigFile { get; set; }
+
+        [Option('b', "max-buffer", DefaultValue = 65000, HelpText = "Maximum block size for compression (1-65535)")]
+        public int MaxBufferSize { get; set; }
+
         [HelpOption]
         public string GetUsage()
         {
             return HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));
-        }
-
-        public static void PrintInt(int x)
-        {
-            for (var i = 0; i < 32; i++)
-            {
-                Console.Write(x & 1);
-                x >>= 1;
-            }
-            Console.WriteLine();
         }
 
         public static void Main(string[] args)
@@ -41,32 +46,45 @@ namespace BrutePack
             var inputFile = brutePackMain.InputFile;
             var outputFile = brutePackMain.OutputFile;
             var decompress = brutePackMain.Decompress;
+
             if (outputFile == "")
             {
                 GenerateOutputFilename(inputFile, decompress, out outputFile);
             }
-            try
+
+            if (!decompress)
             {
-                var stopwatch = Stopwatch.StartNew();
-                if (decompress)
+                if (brutePackMain.ConfigFile.NullOrEmpty() && brutePackMain.ConfigString.NullOrEmpty())
                 {
-                    GZipDecompressor.Decompress(
-                        new FileStream(inputFile, FileMode.Open),
-                        new FileStream(outputFile, FileMode.Create)
-                    );
+                    Console.WriteLine("You must specify -c or -f for compression");
+                    return;
                 }
-                else
-                {
-                    GZipCompressor.Compress(
-                        new FileStream(inputFile, FileMode.Open),
-                        new FileStream(outputFile, FileMode.Create)
-                    );
-                }
-                Console.Out.WriteLine("Time elapsed: " + stopwatch.Elapsed);
             }
-            catch (Exception e)
+
+            var inputStream = new FileStream(inputFile, FileMode.Open);
+            var outputStream = new FileStream(outputFile, FileMode.CreateNew);
+
+
+            if (decompress)
             {
-                Console.WriteLine(e.ToString());
+                using(var uncompressStream = new BruteUncompressingStream(new BinaryReader(inputStream)))
+                    uncompressStream.CopyTo(outputStream);
+                outputStream.Flush();
+                outputStream.Close();
+            }
+            else
+            {
+                var configString = brutePackMain.ConfigFile.NullOrEmpty()
+                    ? brutePackMain.ConfigString
+                    : File.ReadAllText(brutePackMain.ConfigFile);
+                var parsedConfig =
+                    StrategyConfigParser.ParseConfig(configString)
+                        .Concat(Enumerable.Repeat<ICompressionStrategy>(new DumbCompressionStrategy(), 1));
+                var compressingStream = new BruteCompressingStream(new BinaryWriter(outputStream),
+                    brutePackMain.MaxBufferSize, new BruteCompressionStrategy(parsedConfig));
+                inputStream.CopyTo(compressingStream);
+                compressingStream.Flush();
+                compressingStream.Close();
             }
         }
 
