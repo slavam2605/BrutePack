@@ -1,7 +1,8 @@
 ﻿using System;
 using BrutePack.Decompression;
+using BrutePack.FileFormat;
 
-namespace BrutePack.FileFormat.CompressionStrategy
+namespace BrutePack.CompressionStrategy
 {
     public class DumbCompressionStrategy : ICompressionStrategy
     {

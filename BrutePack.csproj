@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BigRationalLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\BigRationalLibrary.1.0.0.0\lib\NETFramework40\BigRationalLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32">
       <HintPath>packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
     </Reference>
@@ -59,8 +56,12 @@
     <Compile Include="ArithmeticCoding\ArithmeticCoder.cs" />
     <Compile Include="BitStream\BitWriter.cs" />
     <Compile Include="BrutePackMain.cs" />
+    <Compile Include="CompressionStrategy\BruteCompressionStrategy.cs" />
+    <Compile Include="CompressionStrategy\DumbCompressionStrategy.cs" />
+    <Compile Include="CompressionStrategy\ICompressionStrategy.cs" />
     <Compile Include="Crc\Crc32.cs" />
     <Compile Include="DataStructure\BlockList.cs" />
+    <Compile Include="Decompression\BlockDecompressor.cs" />
     <Compile Include="Decompression\DecompressionProviderAttribute.cs" />
     <Compile Include="Decompression\IDecompressionProvider.cs" />
     <Compile Include="Deflate\CopyDeflateCompressor.cs" />
@@ -69,14 +70,10 @@
     <Compile Include="ExternalCompressor\ExternalCompressionStrategy.cs" />
     <Compile Include="ExternalCompressor\ExternalCompressorConfig.cs" />
     <Compile Include="ExternalCompressor\ExternalDecompressionProvider.cs" />
-    <Compile Include="FileFormat\BlockDecompressor.cs" />
     <Compile Include="FileFormat\BlockType.cs" />
     <Compile Include="FileFormat\BruteCompressingStream.cs" />
     <Compile Include="FileFormat\BrutePackFile.cs" />
     <Compile Include="FileFormat\BruteUncompressingStream.cs" />
-    <Compile Include="FileFormat\CompressionStrategy\BruteCompressionStrategy.cs" />
-    <Compile Include="FileFormat\CompressionStrategy\DumbCompressionStrategy.cs" />
-    <Compile Include="FileFormat\CompressionStrategy\ICompressionStrategy.cs" />
     <Compile Include="GZip\GZipCompressionStrategy.cs" />
     <Compile Include="GZip\GZipCompressor.cs" />
     <Compile Include="GZip\GZipDecompressionProvider.cs" />

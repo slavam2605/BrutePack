@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
+using BrutePack.CompressionStrategy;
 using BrutePack.ExternalCompressor;
 using BrutePack.FileFormat;
-using BrutePack.FileFormat.CompressionStrategy;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 

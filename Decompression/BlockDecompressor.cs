@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Reflection;
-using BrutePack.Decompression;
-using BrutePack.ExternalCompressor;
+using BrutePack.FileFormat;
 
-namespace BrutePack.FileFormat
+namespace BrutePack.Decompression
 {
     public static class BlockDecompressor
     {
-        private static Dictionary<BlockType, IDecompressionProvider> typeToProvider =
+        private static readonly Dictionary<BlockType, IDecompressionProvider> typeToProvider =
             new Dictionary<BlockType, IDecompressionProvider>();
 
         static BlockDecompressor()

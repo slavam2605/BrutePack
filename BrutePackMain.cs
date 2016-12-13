@@ -1,12 +1,7 @@
 ﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using BrutePack.BitStream;
 using BrutePack.GZip;
-using BrutePack.Huffman;
 using CommandLine;
 using CommandLine.Text;
 

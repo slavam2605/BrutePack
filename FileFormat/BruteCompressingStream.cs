@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using BrutePack.FileFormat.CompressionStrategy;
+using BrutePack.CompressionStrategy;
 
 namespace BrutePack.FileFormat
 {

@@ -1,4 +1,6 @@
-﻿namespace BrutePack.FileFormat.CompressionStrategy
+﻿using BrutePack.FileFormat;
+
+namespace BrutePack.CompressionStrategy
 {
     public interface ICompressionStrategy
     {

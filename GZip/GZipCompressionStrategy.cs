@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using BrutePack.CompressionStrategy;
 using BrutePack.FileFormat;
-using BrutePack.FileFormat.CompressionStrategy;
 
 namespace BrutePack.GZip
 {

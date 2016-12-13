@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BrutePack.Decompression;
 using JetBrains.Annotations;
 
 namespace BrutePack.FileFormat

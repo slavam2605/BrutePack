@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using BrutePack.CompressionStrategy;
 using BrutePack.FileFormat;
-using BrutePack.FileFormat.CompressionStrategy;
 
 namespace BrutePack.ExternalCompressor
 {

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BrutePack.FileFormat;
 
-namespace BrutePack.FileFormat.CompressionStrategy
+namespace BrutePack.CompressionStrategy
 {
     public class BruteCompressionStrategy : ICompressionStrategy
     {
