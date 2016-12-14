@@ -64,11 +64,30 @@ namespace BrutePack_Tests.FileFormat
             Assert.AreEqual(readBytes.Take(TestBlockSize).ToArray(), block.BlockData);
             Assert.AreEqual(readBytes.Skip(TestBlockSize).Take(TestBlockSize).ToArray(), block.BlockData);
         }
-
-        private static BrutePackBlock MakeTestBlock()
+        [Test]
+        public void TestUncompressStreamManyLargeBlocks()
         {
-            var block = new BrutePackBlock(BlockType.Uncompressed, new byte[TestBlockSize]);
-            for (int i = 0; i < TestBlockSize; i++)
+            var block = MakeTestBlock(100);
+
+            var memStream = new MemoryStream();
+            var writer = new BinaryWriter(memStream);
+            writer.WriteBrutePackBlock(block);
+            writer.WriteBrutePackBlock(block);
+            memStream.Seek(0, SeekOrigin.Begin);
+
+            var uncompressStream = new BruteUncompressingStream(new BinaryReader(memStream));
+            var uncompressReader = new BinaryReader(uncompressStream);
+
+            var readBytes = uncompressReader.ReadBytes(TestBlockSize * 200);
+
+            Assert.AreEqual(readBytes.Take(TestBlockSize * 100).ToArray(), block.BlockData);
+            Assert.AreEqual(readBytes.Skip(TestBlockSize * 100).Take(TestBlockSize * 100).ToArray(), block.BlockData);
+        }
+
+        private static BrutePackBlock MakeTestBlock(int sizeMultiplier = 1)
+        {
+            var block = new BrutePackBlock(BlockType.Uncompressed, new byte[TestBlockSize * sizeMultiplier]);
+            for (int i = 0; i < TestBlockSize * sizeMultiplier; i++)
             {
                 block.BlockData[i] = (byte) (i * 5);
             }

@@ -30,7 +30,7 @@ namespace BrutePack
         [Option('f', "file", MutuallyExclusiveSet = "c", HelpText = "Compression configuration file")]
         public string ConfigFile { get; set; }
 
-        [Option('b', "max-buffer", DefaultValue = 65000, HelpText = "Maximum block size for compression (1-65535)")]
+        [Option('b', "max-buffer", DefaultValue = 1024*1024, HelpText = "Maximum block size for compression (1-2097152)")]
         public int MaxBufferSize { get; set; }
 
         [HelpOption]

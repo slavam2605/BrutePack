@@ -13,7 +13,7 @@ namespace BrutePack.FileFormat
 
         public BruteCompressingStream(BinaryWriter internalWriter, int maxBufferSize, ICompressionStrategy compressionStrategy)
         {
-            if (maxBufferSize <= 0 || maxBufferSize > 65535)
+            if (maxBufferSize <= 0 || maxBufferSize >= 1024*1024*2)
                 throw new ArgumentOutOfRangeException(nameof(maxBufferSize));
             this.internalWriter = internalWriter;
             this.compressionStrategy = compressionStrategy;

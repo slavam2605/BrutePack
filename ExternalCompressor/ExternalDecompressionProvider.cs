@@ -30,7 +30,7 @@ namespace BrutePack.ExternalCompressor
             writeTask.ContinueWith(_ => cproc.StandardInput.BaseStream.Close());
 
             var memOutput = new MemoryStream();
-            var readTask = ExternalCompressionStrategy.CopyStreamTo(cproc.StandardOutput.BaseStream, memOutput);
+            var readTask = cproc.StandardOutput.BaseStream.CopyToAsync(memOutput);
 
             writeTask.Wait();
             readTask.Wait();

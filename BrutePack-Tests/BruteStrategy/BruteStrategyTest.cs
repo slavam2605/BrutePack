@@ -48,7 +48,7 @@ namespace BrutePack_Tests.BruteStrategy
             compressingStream.Write(data, 0, TestSize);
             compressingStream.Flush();
 
-            Assert.AreEqual(memStream.Position, TestSize * 3);
+            Assert.AreEqual(memStream.Position, TestSize * 4);
             Console.WriteLine("Compressed {0} to {1} ({2}%)", TestSize, memStream.Position,
                 memStream.Position * 100 / TestSize);
         }

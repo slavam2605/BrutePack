@@ -34,30 +34,14 @@ namespace BrutePack.ExternalCompressor
 
             var readTask = cproc.StandardInput.BaseStream.WriteAsync(data, 0, length);
             readTask.ContinueWith(_ => cproc.StandardInput.BaseStream.Close());
-            var writeTask = CopyStreamTo(cproc.StandardOutput.BaseStream, memStream);
-
-            /*var sched = TaskScheduler.Default;
-            readTask.Start(sched);
-            writeTask.Start(sched);*/
+            var writeTask = cproc.StandardOutput.BaseStream.CopyToAsync(memStream);
 
             readTask.Wait();
             writeTask.Wait();
 
-            if (memStream.Position > 65535)
+            if (memStream.Position >= 1024 * 1024 * 2)
                 return null;
             return new BrutePackBlock(BlockType.External, memStream.ToArray());
-        }
-
-        public static async Task CopyStreamTo(Stream a, Stream b)
-        {
-            while (true)
-            {
-                var buf = new byte[65536];
-                var rdSize = await a.ReadAsync(buf, 0, buf.Length);
-                if (rdSize == 0)
-                    return;
-                await b.WriteAsync(buf, 0, rdSize);
-            }
         }
     }
 }
