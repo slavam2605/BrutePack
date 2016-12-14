@@ -2,6 +2,7 @@
 using System.IO;
 using BrutePack.ExternalCompressor;
 using BrutePack.FileFormat;
+using BrutePack.Util;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -12,15 +13,23 @@ namespace BrutePack_Tests.ExternalCompression
     {
         private const int TestBlockSize = 320000;
 
+        private void IgnoreIfNoCommand(string command)
+        {
+            if(!FileUtil.ExistsOnPath(command))
+                Assert.Ignore("{0} is not present on system", command);
+        }
+
         [Test]
         public void TestCompressionWithCat()
         {
+            IgnoreIfNoCommand("cat");
             TestCompressionWithConfig(new ExternalCompressorConfig("cat", "cat"), false);
         }
 
         [Test]
         public void TestCompressionWithGzip()
         {
+            IgnoreIfNoCommand("gzip");
             TestCompressionWithConfig(new ExternalCompressorConfig("gzip -9 -", "gzip -d -"), true);
         }
 

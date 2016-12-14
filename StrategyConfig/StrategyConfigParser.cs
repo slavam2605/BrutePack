@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BrutePack.ArithmeticCoding;
 using BrutePack.CompressionStrategy;
 using BrutePack.ExternalCompressor;
 using BrutePack.GZip;
@@ -21,6 +22,9 @@ namespace BrutePack.StrategyConfig
                         break;
                     case "gzip":
                         yield return new GZipCompressionStrategy();
+                        break;
+                    case "arithm":
+                        yield return new ArithmeticCodingStrategy(innerSplit.Length > 1 ? int.Parse(innerSplit[1]) : 64);
                         break;
                     case "ext":
                         yield return new ExternalCompressionStrategy(new ExternalCompressorConfig(innerSplit[1], innerSplit[2]));

@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArithmeticCoding\ArithmeticCodingStrategy.cs" />
+    <Compile Include="ArithmeticCoding\ArithmeticDecodingProvider.cs" />
     <Compile Include="BitStream\BitReader.cs" />
     <Compile Include="ArithmeticCoding\ArithmeticCoder.cs" />
     <Compile Include="BitStream\BitWriter.cs" />
@@ -66,6 +68,8 @@
     <Compile Include="Decompression\IDecompressionProvider.cs" />
     <Compile Include="Deflate\CopyDeflateCompressor.cs" />
     <Compile Include="Deflate\DeflateDecompressor.cs" />
+    <Compile Include="Gmp\FastRational.cs" />
+    <Compile Include="Gmp\Integer.cs" />
     <Compile Include="Deflate\StaticHuffmanDeflateCompressor.cs" />
     <Compile Include="ExternalCompressor\ExternalCompressionStrategy.cs" />
     <Compile Include="ExternalCompressor\ExternalCompressorConfig.cs" />
@@ -84,13 +88,13 @@
     <Compile Include="LempelZiv\LZ77.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StrategyConfig\StrategyConfigParser.cs" />
+    <Compile Include="Util\FileUtil.cs" />
     <Compile Include="Util\StringEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ArithmeticCoding" />
     <Folder Include="DataStructure" />
     <Folder Include="FileFormat" />
     <Folder Include="Huffman" />

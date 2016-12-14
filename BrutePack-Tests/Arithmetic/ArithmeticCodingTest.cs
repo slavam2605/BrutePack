@@ -75,7 +75,7 @@ namespace BrutePack_Tests.Arithmetic
             var inStream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var outStream = new MemoryStream();
             var stopwatch = Stopwatch.StartNew();
-            ArithmeticCoder.EncodeStream(inStream, outStream, 1024);
+            ArithmeticCoder.EncodeStream(inStream, outStream, 65536, 16);
             var endpoint = stopwatch.Elapsed;
             Console.WriteLine(endpoint);
             Console.WriteLine("Encoded size is {0}", outStream.Position);

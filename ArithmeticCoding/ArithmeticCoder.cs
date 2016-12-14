@@ -2,22 +2,13 @@
 using System.IO;
 using System.Numerics;
 using System.Xml.Schema;
-using Gnu.MP;
+//using Gnu.MP;
+using BrutePack.Gmp;
 
 namespace BrutePack.ArithmeticCoding
 {
     public static class ArithmeticCoder
     {
-        public static Rational GetWholePart(this Rational num)
-        {
-            return num - num.GetFractionPart();
-        }
-
-        public static Rational GetFractionPart(this Rational num)
-        {
-            return new Rational(num.Numerator % num.Denumerator, num.Denumerator);
-        }
-
         private static Rational[] BuildFrequencyTable(int[] frequencies, int totalSize)
         {
             var frequencyPoints = new Rational[257];
@@ -47,63 +38,111 @@ namespace BrutePack.ArithmeticCoding
             return Encode(data, frequencies, data.Length);
         }
 
-        public static byte[] Encode(byte[] data, int[] frequencies, int dataLength)
+        public static byte[] Encode(byte[] data, int[] frequencies, int dataLength, int innerChunkSize = 128)
         {
-            var leftBound2 = new Rational(0);
             var leftBound = new Rational(0d);
             var rightBound = new Rational(256, 1);
             var frequencyPoints = BuildFrequencyTable(frequencies, dataLength);
             var outStream = new MemoryStream();
+            var tempOut = new MemoryStream(128);
+            var outCount = 0;
 
             for (int i = 0; i < dataLength; i++)
             {
-                var span = (rightBound - leftBound);
-                rightBound = leftBound + span * frequencyPoints[data[i] + 1];
-                leftBound = leftBound + span * frequencyPoints[data[i]];
-                if (leftBound.GetWholePart() == rightBound.GetWholePart())
+                rightBound.SubAssign(leftBound); // rightBound is now span
+                var newRightBound = leftBound + rightBound * frequencyPoints[data[i] + 1];
+                rightBound.MulAssign(frequencyPoints[data[i]]);
+                leftBound.PlusAssign(rightBound);
+                rightBound = newRightBound;
+                var leftParts = leftBound.GetWholeAndFraction();
+                var rightParts = rightBound.GetWholeAndFraction();
+                if (leftParts.Whole == rightParts.Whole)
                 {
-                    outStream.WriteByte((byte) rightBound.GetWholePart());
-                    leftBound = leftBound.GetFractionPart();
-                    rightBound = rightBound.GetFractionPart();
-                    leftBound *= 256;
-                    rightBound *= 256;
+                    tempOut.WriteByte((byte) rightParts.Whole);
+                    leftBound = leftParts.Fraction;
+                    rightBound = rightParts.Fraction;
+                    leftBound.MulAssign(256);
+                    rightBound.MulAssign(256);
+                }
+                outCount++;
+                if (outCount == innerChunkSize - 1)
+                {
+                    while (true)
+                    {
+                        leftParts = leftBound.GetWholeAndFraction();
+                        rightParts = rightBound.GetWholeAndFraction();
+                        tempOut.WriteByte((byte) rightParts.Whole);
+                        if (leftParts.Whole != rightParts.Whole)
+                            break;
+                        leftBound = leftParts.Fraction;
+                        rightBound = rightParts.Fraction;
+                        leftBound.MulAssign(256);
+                        rightBound.MulAssign(256);
+                    }
+                    leftBound.MulAssign(ZERO);
+                    rightBound = new Rational(256, 1);
+                    WriteVarInt(outStream, (int) tempOut.Length);
+                    WriteVarInt(outStream, outCount);
+                    outStream.Write(tempOut.GetBuffer(), 0, (int) tempOut.Length);
+                    tempOut.Position = 0;
+                    tempOut.SetLength(0);
+                    outCount = 0;
                 }
             }
 
             while (true)
             {
-                outStream.WriteByte((byte) rightBound.GetWholePart());
-                if (leftBound.GetWholePart() != rightBound.GetWholePart())
-                    return outStream.ToArray();
-                leftBound = leftBound.GetFractionPart();
-                rightBound = rightBound.GetFractionPart();
-                leftBound *= 256;
-                rightBound *= 256;
+                var leftParts = leftBound.GetWholeAndFraction();
+                var rightParts = rightBound.GetWholeAndFraction();
+                tempOut.WriteByte((byte) rightParts.Whole);
+                if (leftParts.Whole != rightParts.Whole)
+                    break;
+                leftBound = leftParts.Fraction;
+                rightBound = rightParts.Fraction;
+                leftBound.MulAssign(256);
+                rightBound.MulAssign(256);
+
             }
+            WriteVarInt(outStream, (int) tempOut.Length);
+            WriteVarInt(outStream, outCount);
+            outStream.Write(tempOut.GetBuffer(), 0, (int) tempOut.Length);
+
+            return outStream.ToArray();
         }
+
+        private static readonly Rational ZERO = new Rational(0);
 
         public static byte[] Decode(byte[] data, int[] frequencies, int outputSize)
         {
             var leftBound = new Rational(0d);
             var rightBound = new Rational(1, 1);
-            var frequencyPoints = BuildFrequencyTable(frequencies, outputSize);
-            var point = new Rational(0d);
-            for (int i = data.Length - 1; i >= 0; i--)
-                point = (point + data[i]) / 256;
-
+            var inStream = new MemoryStream(data);
             byte[] result = new byte[outputSize];
-            for (int i = 0; i < outputSize; i++)
+            int i = 0;
+            while (inStream.Position < inStream.Length - 1)
             {
-                var scaledPoint = (point - leftBound) / (rightBound - leftBound);
-                for (int j = 255; j >= 0; j--)
+                var encodedSubSize = ReadVarInt(inStream);
+                var decodedNumBytes = ReadVarInt(inStream);
+
+                var frequencyPoints = BuildFrequencyTable(frequencies, outputSize);
+                var point = new Rational(0d);
+                for (int j = (int) (inStream.Position + encodedSubSize - 1); j >= inStream.Position; j--)
+                    point = (point + data[j]) / 256;
+                inStream.Seek(encodedSubSize, SeekOrigin.Current);
+
+                for (; decodedNumBytes > 0; i++, decodedNumBytes--)
                 {
-                    if (scaledPoint >= frequencyPoints[j])
+                    var scaledPoint = (point - leftBound) / (rightBound - leftBound);
+                    for (int j = 255; j >= 0; j--)
                     {
-                        var span = (rightBound - leftBound);
-                        rightBound = leftBound + span * frequencyPoints[j + 1];
-                        leftBound = leftBound + span * frequencyPoints[j];
-                        result[i] = (byte) j;
-                        break;
+                        if (scaledPoint >= frequencyPoints[j])
+                        {
+                            var span = (rightBound - leftBound);
+                            rightBound = leftBound + span * frequencyPoints[j + 1];
+                            leftBound = leftBound + span * frequencyPoints[j];
+                            result[i] = (byte) j;
+                            break;
+                        }
                     }
                 }
             }
@@ -143,7 +182,7 @@ namespace BrutePack.ArithmeticCoding
             }
         }
 
-        public static void EncodeBlockStream(byte[] data, Stream output, int dataSize)
+        public static void EncodeBlockStream(byte[] data, Stream output, int dataSize, int innerChunkSize = 128)
         {
             var frequencies = CalculateFrequencies(data, dataSize);
             WriteVarInt(output, dataSize);
@@ -151,7 +190,7 @@ namespace BrutePack.ArithmeticCoding
             {
                 WriteVarInt(output, frequencies[i]);
             }
-            var encodedData = Encode(data, frequencies, dataSize);
+            var encodedData = Encode(data, frequencies, dataSize, innerChunkSize);
             WriteVarInt(output, encodedData.Length);
             output.Write(encodedData, 0, encodedData.Length);
         }
@@ -177,7 +216,7 @@ namespace BrutePack.ArithmeticCoding
             return Decode(encodedData, frequencies, resultSize);
         }
 
-        public static void EncodeStream(Stream input, Stream output, int blockSize = 65536)
+        public static void EncodeStream(Stream input, Stream output, int blockSize = 65536, int innerChunkSize = 128)
         {
             byte[] block = new byte[blockSize];
             while (true)
@@ -194,7 +233,7 @@ namespace BrutePack.ArithmeticCoding
                     }
                     subBlockRead += read;
                 }
-                EncodeBlockStream(block, output, subBlockRead);
+                EncodeBlockStream(block, output, subBlockRead, innerChunkSize);
                 if (isLastBlock)
                     break;
             }

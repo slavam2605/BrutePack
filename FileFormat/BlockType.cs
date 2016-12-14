@@ -4,6 +4,7 @@
     {
         Uncompressed = 0,
         GZip = 1,
+        Arithmetic = 2,
         External = 255,
     }
 }

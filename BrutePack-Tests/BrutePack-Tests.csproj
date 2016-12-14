@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Arithmetik\ArithmeticCodingTest.cs" />
+    <Compile Include="Arithmetic\ArithmeticCodingTest.cs" />
     <Compile Include="BruteStrategy\BruteStrategyTest.cs" />
     <Compile Include="ConfigParser\ConfigParserTest.cs" />
     <Compile Include="ExternalCompression\ExternalCompressorTest.cs" />
@@ -67,7 +67,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Arithmetik" />
+    <Folder Include="Arithmetic" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
