@@ -8,7 +8,7 @@ namespace BrutePack.CompressionStrategy
     {
         public BrutePackBlock? CompressBlock(byte[] data, int length)
         {
-            if(length > 65535 || length < 0)
+            if(length >= 1024*1024*2 || length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
 
             byte[] newData = new byte[length];
