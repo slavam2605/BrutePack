@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
+using BrutePack.Decompression;
 using BrutePack.FileFormat;
 using NUnit.Framework;
 
@@ -9,6 +11,20 @@ namespace BrutePack_Tests.FileFormat
     public class ReadWriteTest
     {
         private const int TestBlockSize = 1000;
+
+        [Test]
+        [ExpectedException(typeof(ApplicationException))]
+        public void TestUnknownBlock()
+        {
+            var memStream = new MemoryStream();
+            memStream.WriteByte(127);
+            memStream.WriteByte(0);
+            memStream.WriteByte(0);
+            memStream.WriteByte(0);
+            memStream.Position = 0;
+            var block = new BinaryReader(memStream).ReadBlock();
+            BlockDecompressor.Decompress(block);
+        }
 
         [Test]
         public void TestReadWriteRoundtrip()

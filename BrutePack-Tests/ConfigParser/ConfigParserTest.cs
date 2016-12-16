@@ -1,7 +1,9 @@
 ﻿using System.Linq;
+using BrutePack.ArithmeticCoding;
 using BrutePack.ExternalCompressor;
 using BrutePack.GZip;
 using BrutePack.StrategyConfig;
+using CommandLine;
 using NUnit.Framework;
 
 namespace BrutePack_Tests.ConfigParser
@@ -16,6 +18,41 @@ namespace BrutePack_Tests.ConfigParser
 
             Assert.AreEqual(1, list.Count);
             Assert.IsInstanceOf<GZipCompressionStrategy>(list[0]);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ParserException))]
+        public void TestFaultyParsing()
+        {
+            var list = StrategyConfigParser.ParseConfig("top kek").ToList();
+        }
+
+        [Test]
+        public void TestArithmeticParsing()
+        {
+            var list = StrategyConfigParser.ParseConfig("arithm,456").ToList();
+
+            Assert.AreEqual(1, list.Count);
+            Assert.IsInstanceOf<ArithmeticCodingStrategy>(list[0]);
+            Assert.AreEqual(456, ((ArithmeticCodingStrategy) list[0]).InnerChunkSize);
+        }
+
+        [Test]
+        public void TestEmptyPatterns()
+        {
+            Assert.AreEqual(0, StrategyConfigParser.ParseConfig("").ToList().Count);
+        }
+
+        [Test]
+        public void TestMultiEmptyPatterns()
+        {
+            Assert.AreEqual(0, StrategyConfigParser.ParseConfig(";").ToList().Count);
+        }
+
+        [Test]
+        public void TestMultiEmptyNestedPatterns()
+        {
+            Assert.AreEqual(0, StrategyConfigParser.ParseConfig(",;,").ToList().Count);
         }
 
         [Test]
