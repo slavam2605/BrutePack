@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BrutePack.ArithmeticCoding;
+using BrutePack.ExternalCompressor;
+using BrutePack.FileFormat;
 using NUnit.Framework;
 
 namespace BrutePack_Tests.Arithmetic
@@ -79,6 +81,39 @@ namespace BrutePack_Tests.Arithmetic
             var endpoint = stopwatch.Elapsed;
             Console.WriteLine(endpoint);
             Console.WriteLine("Encoded size is {0}", outStream.Position);
+        }
+
+        [Test]
+        [Ignore("Native library is unstable, investigate further")]
+        public void TestCodingStrategy()
+        {
+            TestCompressionWithConfig(64);
+        }
+
+        private const int TestBlockSize = 32;
+
+        public void TestCompressionWithConfig(int size)
+        {
+            var strategy = new ArithmeticCodingStrategy(size);
+
+            var data = new byte[TestBlockSize];
+            for (int i = 0; i < TestBlockSize; i++)
+            {
+                data[i] = (byte)(i * 128 + 1);
+            }
+
+            var memStream = new MemoryStream();
+            var compressingStream = new BruteCompressingStream(new BinaryWriter(memStream), TestBlockSize, strategy);
+            compressingStream.Write(data, 0, TestBlockSize);
+            compressingStream.Flush();
+
+            memStream.Seek(0, SeekOrigin.Begin);
+            var decompressingStream = new BruteUncompressingStream(new BinaryReader(memStream));
+            var decompressingReader = new BinaryReader(decompressingStream);
+
+            var readBlock = decompressingReader.ReadBytes(TestBlockSize);
+
+            Assert.AreEqual(data, readBlock);
         }
     }
 }

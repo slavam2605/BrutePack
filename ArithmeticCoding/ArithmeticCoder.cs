@@ -161,7 +161,7 @@ namespace BrutePack.ArithmeticCoding
                     s.WriteByte((byte) value);
                     return;
                 }
-                s.WriteByte((byte) (0x80 | value & 0x7f));
+                s.WriteByte((byte) (0x80 | (value & 0x7f)));
                 value >>= 7;
             }
         }
@@ -169,12 +169,14 @@ namespace BrutePack.ArithmeticCoding
         private static int ReadVarInt(Stream s)
         {
             var result = 0;
+            var offset = 0;
             while (true)
             {
                 var read = s.ReadByte();
                 if(read == -1)
                     throw new EndOfStreamException("Unexpected EOF while reading varint");
-                result = (result << 7) | (read & 0x7f);
+                result = result | ((read & 0x7f) << offset);
+                offset += 7;
                 if ((read & 0x80) == 0)
                 {
                     return result;
