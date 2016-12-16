@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using BrutePack.CompressionStrategy;
 using BrutePack.FileFormat;
 
@@ -13,7 +12,7 @@ namespace BrutePack.ExternalCompressor
 
         public ExternalCompressionStrategy(ExternalCompressorConfig config)
         {
-            this.Config = config;
+            Config = config;
         }
 
         public BrutePackBlock? CompressBlock(byte[] data, int length)

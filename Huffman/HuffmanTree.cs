@@ -1,8 +1,5 @@
 ﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace BrutePack.Huffman
 {
@@ -50,6 +47,8 @@ namespace BrutePack.Huffman
 
         private void Dfs(ref int[] code, ref int[] codeLenghts, int state, int length)
         {
+            if (state >= tree.Length)
+                return;
             if (tree[state] >= 0)
             {
                 code[tree[state]] = ReverseInt(state - ((1 << length) - 1), length);

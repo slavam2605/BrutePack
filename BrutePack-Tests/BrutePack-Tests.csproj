@@ -53,8 +53,8 @@
     <Compile Include="ExternalCompression\ExternalCompressorTest.cs" />
     <Compile Include="FileFormat\ReadWriteTest.cs" />
     <Compile Include="GZip\GZipTest.cs" />
+    <Compile Include="Huffman\HuffmanTreeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestTest.cs" />
     <Compile Include="TestUtil.cs" />
   </ItemGroup>
   <ItemGroup>
