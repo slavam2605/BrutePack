@@ -16,7 +16,7 @@ namespace BrutePack.Util
                 return Path.GetFullPath(fileName);
 
             var values = Environment.GetEnvironmentVariable("PATH");
-            foreach (var path in values.Split(';'))
+            foreach (var path in values.Split(';', ':'))
             {
                 var fullPath = Path.Combine(path, fileName);
                 if (File.Exists(fullPath))
