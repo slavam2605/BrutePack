@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using BrutePack.Deflate;
 using BrutePack.GZip;
@@ -87,6 +88,65 @@ namespace BrutePack_Tests.GZip
             Assert.AreEqual(rawOutput[3], (byte) ~rawOutput[1]);
             Assert.AreEqual(rawOutput[4], (byte) ~rawOutput[2]);
             CollectionAssert.AreEqual(rawInput, rawOutput.Skip(5));
+        }
+
+        [Test]
+        public void TestCompliance1()
+        {
+            var path1 = TestUtil.GetTestDataDir() + "file1.gz";
+            var path2 = TestUtil.GetTestDataDir() + "file1";
+            var input = new FileStream(path1, FileMode.Open);
+            var output = new MemoryStream();
+            GZipDecompressor.Decompress(input, output);
+            var inputNotCompressed = new FileStream(path2, FileMode.Open);
+            var rawData = new byte[inputNotCompressed.Length];
+            var count = inputNotCompressed.Read(rawData, 0, rawData.Length);
+            var uncompressed = output.ToArray();
+            CollectionAssert.AreEqual(rawData.Take(count), uncompressed);
+        }
+
+        [Test]
+        public void TestCompliance2()
+        {
+            var path1 = TestUtil.GetTestDataDir() + "file2.gz";
+            var path2 = TestUtil.GetTestDataDir() + "file2";
+            var input = new FileStream(path1, FileMode.Open);
+            var output = new MemoryStream();
+            GZipDecompressor.Decompress(input, output);
+            int count;
+            var rawData = ReadFile(path2, out count);
+            var uncompressed = output.ToArray();
+            CollectionAssert.AreEqual(rawData.Take(count), uncompressed);
+        }
+
+        [Test]
+        public void TestSelfCompliance()
+        {
+            var path1 = TestUtil.GetTestDataDir() + "file";
+            var path2 = TestUtil.GetTestDataDir() + "file.gz";
+            var path3 = TestUtil.GetTestDataDir() + "outFile";
+            var stream1 = new FileStream(path1, FileMode.Open);
+            var stream2 = new FileStream(path2, FileMode.Create);
+            GZipCompressor.Compress(stream1, stream2);
+            stream2.Seek(0, SeekOrigin.Begin);
+            var stream3 = new FileStream(path3, FileMode.Create);
+            GZipDecompressor.Decompress(stream2, stream3);
+            stream1.Close();
+            stream2.Close();
+            stream3.Close();
+            int count1, count2;
+            var buffer1 = ReadFile(path1, out count1);
+            var buffer2 = ReadFile(path3, out count2);
+            CollectionAssert.AreEqual(buffer1.Take(count1), buffer2.Take(count2));
+        }
+
+        private static byte[] ReadFile(string path2, out int count)
+        {
+            var inputNotCompressed = new FileStream(path2, FileMode.Open);
+            var rawData = new byte[inputNotCompressed.Length];
+            count = inputNotCompressed.Read(rawData, 0, rawData.Length);
+            inputNotCompressed.Close();
+            return rawData;
         }
 
         private static byte[] GetBytes(string str)
